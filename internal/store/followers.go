@@ -35,3 +35,16 @@ func (s *FollowerStore) Follow(ctx context.Context, followerID, userID int64) er
 
 	return nil
 }
+
+func (s *FollowerStore) Unfollow(ctx context.Context, followerID, userID int64) error {
+	query := `
+		DELETE FROM followers
+		WHERE user_id = $1 AND follower_id = $2
+	`
+
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
+	_, err := s.db.ExecContext(ctx, query, userID, followerID)
+	return err
+}
